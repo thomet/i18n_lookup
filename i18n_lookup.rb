@@ -1,10 +1,7 @@
 require 'i18n'
-$logger = if defined?(Rails)
-            Rails.logger
-          else
-            require 'logger'
-            Logger.new(STDOUT)
-          end
+require 'logger'
+
+$logger = Logger.new(STDOUT)
 
 # Default: only not founding translations are printed on console
 # if ENV['I18N_DEBUG'] is set to true, all not founding keys are printed on console
@@ -15,7 +12,7 @@ module I18nLookup
     result = super(locale, key, scope, options)
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
 
-    unless same_key?(keys)
+    unless (same_key?(keys) && same_caller?)
       @last_key ||= keys.last
       print_main_key(keys)
     end
@@ -31,6 +28,17 @@ module I18nLookup
   end
 
   private
+
+  def same_caller?
+    @@last_caller ||= caller
+    current_caller = caller
+    lines = current_caller.length
+    i18n_index = current_caller.reverse.index{|line| line =~ /i18n/}
+    start_line = lines - i18n_index
+    result = (current_caller[start_line..-1] - @@last_caller[start_line..-1]).empty?
+    @@last_caller = current_caller
+    result
+  end
 
   def same_key?(keys)
     @last_key && @last_key.eql?(keys.last)
