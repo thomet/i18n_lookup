@@ -3,8 +3,7 @@ require 'logger'
 
 $logger = Logger.new(STDOUT)
 
-# Default: only not founding translations are printed on console
-# if ENV['I18N_DEBUG'] is set to true, all not founding keys are printed on console
+# if ENV['I18N_DEBUG'] is set to true, all keys are printed on console
 module I18nLookup
   protected
 
