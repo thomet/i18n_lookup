@@ -11,3 +11,14 @@ end
 
 It provides a way to see the i18n calls.
 
+# Usage
+
+Put this in your Gemflie
+
+```ruby
+gem 'i18n_lookup', :git => 'https://gist.github.com/117577371c07c663391e.git'
+```
+and set the I18N_DEBUG=true e.g.
+```
+I18N_DEBUG=true rails s
+```
