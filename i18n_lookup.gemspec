@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version      = '0.1.0'
   s.platform     = Gem::Platform::RUBY
 
-  s.license = 'MIT'
+  s.license      = 'MIT'
 
   s.files        = ['i18n_lookup.rb']
   s.test_file    = 'i18n_lookup_spec.rb'
