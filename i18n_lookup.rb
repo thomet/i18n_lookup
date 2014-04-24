@@ -8,18 +8,27 @@ module I18nLookup
   protected
 
   def lookup(locale, key, scope = [], options = {})
+    @@i18n_fallbacks ||= []
+    @@last_key ||= nil
+
     result = super(locale, key, scope, options)
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
 
-    unless (same_key?(keys) && same_caller?)
-      @last_key ||= keys.last
+    if same_key?(keys) && (@@i18n_fallbacks.include?(key) || same_caller?)
+      @@i18n_fallbacks << options[:default]
+      @@i18n_fallbacks << key
+      @@i18n_fallbacks.flatten!
+    else
+      @@last_key ||= keys.last
+      @@i18n_fallbacks = [options[:default], key].flatten
+
       print_main_key(keys)
     end
 
     if result
       print_keys(keys, 33)
       print_result(result)
-      @last_key = nil
+      @@last_key = nil
     else
       print_keys(keys, 31)
     end
@@ -40,7 +49,7 @@ module I18nLookup
   end
 
   def same_key?(keys)
-    @last_key && @last_key.eql?(keys.last)
+    @@last_key && @@last_key.eql?(keys.last)
   end
 
   def print_main_key(keys, color_code = 34)

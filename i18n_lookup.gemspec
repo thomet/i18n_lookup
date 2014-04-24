@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name         = 'i18n_lookup'
   s.summary      = 'I18n Lookup'
   s.description  = 'Prints out the I18n calls'
-  s.version      = '0.1.0'
+  s.version      = '0.2.0'
   s.platform     = Gem::Platform::RUBY
 
   s.license      = 'MIT'
@@ -22,4 +22,3 @@ Gem::Specification.new do |s|
   s.add_development_dependency('awesome_print', ["~> 1.2"])
   s.add_development_dependency('activemodel', ["~> 4.0.2"])
 end
-

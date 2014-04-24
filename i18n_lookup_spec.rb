@@ -22,7 +22,7 @@ describe I18nLookup do
       {:en =>{:attributes => {:my_attribute => 'My Attribute'}}}
     end
 
-    it 'should x' do
+    it 'should print the keys as group with a result' do
       expected_result = translations[:en][:attributes][:my_attribute]
       main_key        = [:en, :activemodel, :attributes, :active_model_test, :my_attribute]
       second_key      = [:en, :attributes, :my_attribute]
@@ -35,7 +35,7 @@ describe I18nLookup do
       ActiveModelTest.human_attribute_name('my_attribute')
     end
 
-    it 'should y' do
+    it 'should print the keys as group without a result' do
       main_key   = [:en, :activemodel, :attributes, :active_model_test, :my_attribute_2]
       second_key = [:en, :attributes, :my_attribute_2]
 
@@ -52,7 +52,7 @@ describe I18nLookup do
       {:en => {:test => 'My Test'}}
     end
 
-    it 'should z' do
+    it 'should print the key with a result' do
       expected_result = translations[:en][:test]
       main_key        = [:en, :test]
 
@@ -61,6 +61,25 @@ describe I18nLookup do
       subject.should_receive(:print_result).with(expected_result)
 
       I18n.t :test
+    end
+
+    context 'with a default' do
+      let(:translations) do
+        {:en => {:test2 => {:my_attr => 'My Test'}}}
+      end
+
+      it 'should print the key with a result' do
+        expected_result = translations[:en][:test2][:my_attr]
+        main_key        = [:en, :test, :my_attr]
+        second_key      = [:en, :test2, :my_attr]
+
+        subject.should_receive(:print_main_key).with(main_key)
+        subject.should_receive(:print_keys).with(main_key, 31)
+        subject.should_receive(:print_keys).with(second_key, 33)
+        subject.should_receive(:print_result).with(expected_result)
+
+        I18n.t :'test.my_attr', :default => :'test2.my_attr'
+      end
     end
   end
 end
