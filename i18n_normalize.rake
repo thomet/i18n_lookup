@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 namespace :i18n do
-  desc 'Writes current default locale translations to a normalized file and deletes unused locale files - currently no multi-language support'
+  desc 'Writes current default locale translations to a normalized file and deletes unused locale files'
   task :normalize => :environment do
     class Hash
       def to_hash_recursive
@@ -46,9 +46,9 @@ namespace :i18n do
       end
     end
 
-    def current_i18n_yaml
-      default_locale_translations = I18n.backend.send(:translations)[I18n.default_locale].with_indifferent_access.to_hash_recursive
-      i18n_yaml = {I18n.default_locale.to_s => default_locale_translations}.sort_by_key(true).to_yaml
+    def current_i18n_yaml(locale)
+      default_locale_translations = I18n.backend.send(:translations)[locale].with_indifferent_access.to_hash_recursive
+      i18n_yaml = {locale.to_s => default_locale_translations}.sort_by_key(true).to_yaml
       process = i18n_yaml.split(/\n/).reject{|e| e == ''}[1..-1]  # remove "---" from first line in yaml
 
       # add an empty line if yaml tree level changes by 2 or more
@@ -65,11 +65,11 @@ namespace :i18n do
       tmp_ary * "\n"
     end
 
-    generated_locale_yaml = current_i18n_yaml
+    generated_locale_yaml = {}
 
-
-    fn = File.join Rails.root, 'config', 'locales', I18n.default_locale.to_s + '.yml'
-    f_size_before = File.exists?(fn) ? File.size(fn) : 0
+    I18n.backend.send(:translations).keys.each do |locale|
+      generated_locale_yaml[locale] = current_i18n_yaml(locale)
+    end
 
     # delete unused locale files
     repo_root = %x(git rev-parse --show-toplevel).strip
@@ -80,16 +80,21 @@ namespace :i18n do
     end
 
     # write normalized locale to file
-    File.open(fn, 'w') { |file| file.puts generated_locale_yaml}
-    f_size_after = File.size fn
-    puts "\n(re)generated #{fn}\n"
+    generated_locale_yaml.keys.each do |locale|
+      fn = File.join Rails.root, 'config', 'locales', locale.to_s + '.yml'
+      f_size_before = File.exists?(fn) ? File.size(fn) : 0
 
-    if f_size_before == 0
-      puts "\"#{fn}\" created, file size: #{f_size_after} bytes.\n"
-    elsif f_size_before != f_size_after
-      puts "\"#{fn}\" changed from #{f_size_before} to #{f_size_after} bytes.\n"
-    else
-      puts "\"#{fn}\" is still #{f_size_after} bytes.\n"
+      File.open(fn, 'w') { |file| file.puts generated_locale_yaml[locale]}
+      f_size_after = File.size fn
+      puts "\n(re)generated #{fn}\n"
+
+      if f_size_before == 0
+        puts "\"#{fn}\" created, file size: #{f_size_after} bytes.\n"
+      elsif f_size_before != f_size_after
+        puts "\"#{fn}\" changed from #{f_size_before} to #{f_size_after} bytes.\n"
+      else
+        puts "\"#{fn}\" is still #{f_size_after} bytes.\n"
+      end
     end
   end
 end
