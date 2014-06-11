@@ -5,6 +5,8 @@ $logger = Logger.new(STDOUT)
 
 # if ENV['I18N_DEBUG'] is set to true, all keys are printed on console
 module I18nLookup
+  require 'i18n_lookup/railtie' if defined?(Rails)
+
   protected
 
   def lookup(locale, key, scope = [], options = {})
