@@ -67,7 +67,13 @@ namespace :i18n do
 
     generated_locale_yaml = {}
 
-    I18n.backend.send(:translations).keys.each do |locale|
+    locales = (I18n.available_locales & I18n.backend.send(:translations).keys)
+    if locales.empty?
+      puts 'No locales found'
+      exit 0
+    end
+
+    locales.each do |locale|
       generated_locale_yaml[locale] = current_i18n_yaml(locale)
     end
 
