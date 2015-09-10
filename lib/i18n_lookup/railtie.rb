@@ -7,7 +7,7 @@ module I18nLookup
 
     rake_tasks do
       load "tasks/i18n_normalize.rake"
-      load "tasks/i18n_missing_keys.rake"
+      #load "tasks/i18n_missing_keys.rake"
     end
   end
 end
